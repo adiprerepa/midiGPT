@@ -139,3 +139,5 @@ sandbox/
 scratch/
 checkpoints/
 .DS_Store
+
+/app/__pycache__
