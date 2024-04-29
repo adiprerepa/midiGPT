@@ -19,6 +19,7 @@ class BachChoralesEncoder:
     def encode(self, chorale):
         chorale = torch.as_tensor(chorale)
         chorale[chorale > 0] = chorale[chorale > 0] - self.shift
+        print(chorale)
         return chorale
 
     def decode(self, chorale):
