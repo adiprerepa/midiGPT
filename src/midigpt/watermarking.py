@@ -14,7 +14,7 @@ class WatermarkBase:
         self,
         vocab_size: list[int] = 47,
         gamma: float = 0.25,
-        delta: float = 2.0,
+        delta: float = 10.0,
         seeding_scheme: str = "simple_1",  # mostly unused/always default
         hash_key: int = 15485863,  # just a large prime number to create a rng seed with sufficient bit width
         select_green_tokens: bool = True,
@@ -102,7 +102,7 @@ class WatermarkDetector(WatermarkBase):
         *args,
         device: torch.device = None,
         tokenizer = None,
-        z_threshold: float = 2.0,
+        z_threshold: float = 3.0,
         normalizers: list[str] = ["unicode"],  # or also: ["unicode", "homoglyphs", "truecase"]
         ignore_repeated_bigrams: bool = False,
         **kwargs,
