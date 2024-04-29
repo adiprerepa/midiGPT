@@ -66,7 +66,7 @@ class GPT(nn.Module):
         temperature: float = 1.0,
         do_sample: bool = False,
         top_k: Optional[int] = None,
-        as_list: bool = False,
+        as_list: bool = False, watermark_proccessor = None
     ):
         idx = torch.as_tensor(idx, dtype=torch.long, device=self.device)[None, ...]
         changed_training_mode = False
@@ -80,6 +80,10 @@ class GPT(nn.Module):
             logits, _ = self(idx_cond)
             # pluck the logits at the final step and scale by desired temperature
             logits = logits[:, -1, :] / (temperature + 1e-8)
+            idx_cond, logits = idx_cond.cpu(), logits.cpu()
+            if watermark_proccessor is not None:
+                logits = watermark_proccessor(idx_cond, logits)
+            idx_cond, logits = idx_cond.to(idx.device), logits.to(idx.device)
             # optionally crop the logits to only the top k options
             if top_k is not None:
                 logits[logits < torch.topk(logits, top_k)[0][:, [-1]]] = -float("Inf")

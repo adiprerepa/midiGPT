@@ -3,6 +3,7 @@ from pathlib import Path
 from . import datasets
 from .config import ModelConfigure, TrainConfigure
 from .gpt import GPT
+from .watermarking import WatermarkLogitsProcessor, WatermarkDetector
 from .player import TetradPlayer
 from .trainer import Trainer
 
