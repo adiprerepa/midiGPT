@@ -23,7 +23,7 @@ class GPT(nn.Module):
 
         self.apply(self._init_weights)
         self.context_length = config.context_length
-        self.device = utils.get_auto_device() if config.device == "auto" else config.device
+        self.device = "cpu"
 
     def _init_weights(self, module):
         if isinstance(module, (nn.Linear, nn.Embedding)):
@@ -41,7 +41,7 @@ class GPT(nn.Module):
         config = checkpoint["model_config"]
         model = cls(ModelConfigure(**config))
         model.load_state_dict(checkpoint["model_state_dict"])
-        model.to(utils.get_auto_device() if config["device"] == "auto" else config["device"])
+        model.to("cpu")
         return model
 
     def forward(self, x: torch.LongTensor, targets: Optional[torch.LongTensor] = None):

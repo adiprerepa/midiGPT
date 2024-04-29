@@ -46,3 +46,4 @@ for temperature in [0.5]:
     with open(f"projects/bach-chorales/detection-{temperature}.txt", "a") as f:
         f.write(f"watermarked detection result: {watermarked_detection_result}\n")
     
+
