@@ -12,7 +12,17 @@ WATERMARK_DETECTION_API_URL = "TODO: watermark api"
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # Define your metrics and their values
+    metrics = [
+        {"name": "z-score Threshold", "value": None},
+        {"name": "z-score", "value": None},
+        {"name": "p value", "value": None},
+        {"name": "Tokens Counted (T)", "value": None},
+        {"name": "Prediction", "value": None},
+        {"name": "Fraction of T in Greenlist", "value": None},
+        {"name": "# Tokens in Greenlist", "value": None}
+    ]
+    return render_template('index.html', metrics=metrics, w_metrics=metrics, detect_metrics=metrics)
 
 @app.route('/generate_music', methods=['POST'])
 def generate_music():

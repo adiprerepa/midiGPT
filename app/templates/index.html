@@ -33,11 +33,21 @@
     }
     .tabcontent {
         display: none;
+        flex-direction: column;
         padding: 20px;
         border: 1px solid #ccc;
         border-top: none;
         border-radius: 8px;
         background-color: #f9f9f9;
+        box-shadow: 5px 5px 15px #e0e0e0, -5px -5px 15px #ffffff;
+    }
+    .row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        border: 1px solid black;
+        border-radius: 8px;
+        background-color: white;
         box-shadow: 5px 5px 15px #e0e0e0, -5px -5px 15px #ffffff;
     }
     .file-upload-button {
@@ -79,24 +89,69 @@
     <button class="tablinks active" onclick="openTab(event, 'GenerateMusic')">Generate Music</button>
     <button class="tablinks" onclick="openTab(event, 'DetectWatermark')">Detect Watermark</button>
 </div>
-
+<!-- GENERATION CODE -->
 <div id="GenerateMusic" class="tabcontent" style="display:block;">
-    <h3>Upload MP3 for Music Generation</h3>
+    <h3>Upload wav for Music Generation</h3>
     <label for="musicFile1" class="file-upload-button">Choose File</label>
-    <input type="file" id="musicFile1" name="musicFile1" style="display: none;" onchange="updateFile(this)">
-    <button class="generate-button" onclick="generateMusic()">Generate!</button>
-    <!-- Add more elements here for music generation -->
+    <input type="file" id="musicFile1" name="musicFile1" style="display: none;" onchange="updateFile(this)" accept=".wav">
+    <button class="generate-button" onclick="generateMusic()">Generate and Detect</button>
+    <audio id="audioPlayer" controls style="margin-top: 20px; display: none;"></audio>
+    <div class="row">
+        <audio id="generated_FilePlayer" controls style="margin-top: 20px; display: none;"></audio>
+        <table id="table_generated_file">
+            <tr>
+                <th>Metric</th>
+                <th>Value</th>
+            </tr>
+            {% for metric in metrics %}
+            <tr>
+                <td>{{ metric['name'] }}</td>
+                <td>{{ metric['value'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="row">
+        <audio id="generated_w_FilePlayer" controls style="margin-top: 20px; display: none;"></audio>
+        <table id="table_w_generated_file">
+            <tr>
+                <th>Metric</th>
+                <th>Value</th>
+            </tr>
+            {% for metric in w_metrics %}
+            <tr>
+                <td>{{ metric['name'] }}</td>
+                <td>{{ metric['value'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
-
+<!-- DETECTION CODE -->
 <div id="DetectWatermark" class="tabcontent">
-    <h3>Upload MP3 for Watermark Detection</h3>
+    <h3>Upload wav for Watermark Detection</h3>
     <label for="musicFile2" class="file-upload-button">Choose File</label>
-    <input type="file" id="musicFile2" name="musicFile2" style="display: none;" onchange="updateFile(this)">
+    <input type="file" id="musicFile2" name="musicFile2" style="display: none;" onchange="updateFile(this)" accept=".wav">
     <button class="generate-button" onclick="detectWatermark()">Detect!</button>
     <meter id="confidenceMeter" min="0" max="1" value="0"></meter>
+    <div class="row">
+        <audio id="toDetect_FilePlayer" controls style="margin-top: 20px; display: none;"></audio>
+        <table id="table_toDetect">
+            <tr>
+                <th>Metric</th>
+                <th>Value</th>
+            </tr>
+            {% for metric in detect_metrics %}
+            <tr>
+                <td>{{ metric['name'] }}</td>
+                <td>{{ metric['value'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
 
-<audio id="audioPlayer" controls style="margin-top: 20px; display: none;"></audio>
+
 
 <script>
     function openTab(evt, tabName) {
@@ -141,6 +196,7 @@
         // Create FormData object to send file
         var formData = new FormData();
         formData.append('music_file', file);
+        formData.append('max_tokens', 512);
 
         // Make AJAX request to Flask API
         var xhr = new XMLHttpRequest();
@@ -150,12 +206,12 @@
                 var response = JSON.parse(xhr.responseText);
                 // Handle the response from the Flask API
                 alert("Music generated successfully!");
-                // Download the generated mp3 file in response
+                // Download the generated wav file in response
                 var blob = new Blob([response.data], {type: 'audio/mpeg'});
                 var url = URL.createObjectURL(blob);
                 var a = document.createElement('a');
                 a.href = url;
-                a.download = 'generated_music.mp3';
+                a.download = 'generated_music.wav';
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
