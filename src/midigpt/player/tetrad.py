@@ -21,7 +21,7 @@ from IPython.display import Audio, display
 from scipy.io import wavfile
 from scipy.fft import rfft, rfftfreq
 from scipy.signal import find_peaks
-
+import io
 
 
 __all__ = ["TetradPlayer"]
@@ -145,6 +145,15 @@ class TetradPlayer:
         samples = self.chords_to_samples(chords, **self._get_sampling_kwargs(**kwargs))
         samples = (2**15 * samples).astype(np.int16)
         wavfile.write(file_path, kwargs.get("sample_rate", self.sample_rate), samples)
+    
+    
+    def to_wav_buffer(self, chords, file_path, **kwargs):
+        samples = self.chords_to_samples(chords, **self._get_sampling_kwargs(**kwargs))
+        samples = (2**15 * samples).astype(np.int16)
+        buffer = io.BytesIO()
+        wavfile.write(buffer, kwargs.get("sample_rate", self.sample_rate), samples)
+        buffer.seek(0)
+        return buffer
 
     def from_wav(self, file_path, **kwargs):
         sample_rate, samples = wavfile.read(file_path)
