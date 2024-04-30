@@ -35,8 +35,9 @@ def generate_music():
     model = GPT.from_checkpoint("projects/bach-chorales/best_model.ckpt", map_location=torch.device("cpu"))
     encoder = BachChoralesEncoder()
     
-    tempo = int(request.args['tempo'])
+    
     max_tokens = int(request.args['max_tokens'])
+    tempo = int(request.args['tempo'])
     do_sample = bool(request.args['do_sample'])
     temperature= float(request.args['temperature'])
     
