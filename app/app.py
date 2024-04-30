@@ -50,18 +50,20 @@ def generate_music():
     
     unwatermarked_chords = encoder.decode(model.generate(seed_notes, max_tokens, do_sample= do_sample, temperature= temperature))
     
-    unwatermarked_buffer = TetradPlayer().to_wav_buffer(unwatermarked_chords.flatten().reshape(-1, 4).cpu(), f"", tempo= tempo)
+    TetradPlayer().to_wav(unwatermarked_chords.flatten().reshape(-1, 4).cpu(), "unwatermarked_generation.wav", tempo = tempo)
     
     unwatermarked_detection_result = watermark_detector.detect(text= unwatermarked_chords[-(max_tokens):])
     
     watermarked_chords = encoder.decode(model.generate(seed_notes, max_tokens, do_sample= do_sample, temperature= temperature, watermark_proccessor= watermark_processor))
-    watermarked_buffer = TetradPlayer().to_wav_buffer(watermarked_chords.flatten().reshape(-1, 4).cpu(), f"", tempo= tempo)
+    
+    TetradPlayer().to_wav(watermarked_chords.flatten().reshape(-1, 4).cpu(), "watermarked_generation.wav", tempo = tempo)
+
     watermarked_detection_result = watermark_detector.detect(text= watermarked_chords[-(max_tokens):])
     
     
     combined_response = {
-        'unwatermarked_buffer': unwatermarked_buffer.getvalue(),
-        'watermarked_buffer': watermarked_buffer.getvalue(),
+        'unwatermarked_buffer': "unwatermarked_generation.wav",
+        'watermarked_buffer': "watermarked_generation.wav",
         'unwatermarked_detection_result': unwatermarked_detection_result,
         'watermarked_detection_result': watermarked_detection_result
     }
@@ -69,10 +71,8 @@ def generate_music():
     if music_file.filename == '':
         return jsonify({'error': 'No file selected'}), 400
 
-    # Call the music generation API
     try:
-        json_response = json.dumps(combined_response)
-        return make_response(json_response)
+        return jsonify(combined_response)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
