@@ -92,9 +92,25 @@
 <!-- GENERATION CODE -->
 <div id="GenerateMusic" class="tabcontent" style="display:block;">
     <h3>Upload wav for Music Generation</h3>
-    <label for="musicFile1" class="file-upload-button">Choose File</label>
+    <form action="/generate_music" method="POST" enctype="multipart/form-data">
+        <label for="music_file">Upload WAV File:</label>
+        <input type="file" id="music_file" name="music_file"><br>
+        
+        <label for="temperature">Temperature:</label>
+        <input type="range" id="temperature" name="temperature" min="0" max="1" step="0.1" value="0.5">
+        <span id="temperatureValue">0.5</span><br><br>
+
+        <label for="max_tokens">Max Tokens:</label>
+        <input type="range" id="max_tokens" name="max_tokens" min="4" max="100" value="50" step="4">
+        <span id="maxTokensValue">50</span><br><br>
+
+        <label for="tempo">Tempo:</label>
+        <input type="range" id="tempo" name="tempo" min="0.5" max="2" step="0.1" value="1">
+        <span id="tempoValue">1</span><br><br>
+
+        <input type="submit" value="Generate and Detect" class="generate-button">
+    </form>
     <input type="file" id="musicFile1" name="musicFile1" style="display: none;" onchange="updateFile(this)" accept=".wav">
-    <button class="generate-button" onclick="generateMusic()">Generate and Detect</button>
     <audio id="audioPlayer" controls style="margin-top: 20px; display: none;"></audio>
     <div class="row">
         <audio id="generated_FilePlayer" controls style="margin-top: 20px; display: none;"></audio>
@@ -154,6 +170,27 @@
 
 
 <script>
+    // Update slider values
+    const temperatureSlider = document.getElementById('temperature');
+    const temperatureValue = document.getElementById('temperatureValue');
+    temperatureValue.innerHTML = temperatureSlider.value;
+    temperatureSlider.oninput = function() {
+        temperatureValue.innerHTML = this.value;
+    };
+
+    const maxTokensSlider = document.getElementById('max_tokens');
+    const maxTokensValue = document.getElementById('maxTokensValue');
+    maxTokensValue.innerHTML = maxTokensSlider.value;
+    maxTokensSlider.oninput = function() {
+        maxTokensValue.innerHTML = this.value;
+    };
+
+    const tempoSlider = document.getElementById('tempo');
+    const tempoValue = document.getElementById('tempoValue');
+    tempoValue.innerHTML = tempoSlider.value;
+    tempoSlider.oninput = function() {
+        tempoValue.innerHTML = this.value;
+    };
     function openTab(evt, tabName) {
         var i, tabcontent, tablinks;
         tabcontent = document.getElementsByClassName("tabcontent");
