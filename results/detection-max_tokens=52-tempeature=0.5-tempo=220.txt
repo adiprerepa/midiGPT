@@ -1,0 +1,2 @@
+unwatermarked detection result: {'num_tokens_scored': 51, 'num_green_tokens': 10, 'green_fraction': 0.19607843137254902, 'z_score': -0.8892972917998876, 'p_value': 0.813078336698922, 'prediction': False}
+watermarked detection result: {'num_tokens_scored': 51, 'num_green_tokens': 34, 'green_fraction': 0.6666666666666666, 'z_score': 6.871842709362768, 'p_value': 3.168890774696236e-12, 'prediction': True, 'confidence': 0.9999999999968311}

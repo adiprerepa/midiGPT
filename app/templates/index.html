@@ -98,7 +98,7 @@
         <input type="file" id="music_file" name="music_file"><br>
         
         <label for="temperature">Temperature:</label>
-        <input type="range" id="temperature" name="temperature" min="0" max="1" step="0.1" value="0.5">
+        <input type="range" id="temperature" name="temperature" min="0" max="1.5" step="0.1" value="0.5">
         <span id="temperatureValue">0.5</span><br><br>
 
         <label for="max_tokens">Max Tokens:</label>
@@ -111,14 +111,14 @@
 
         <input type="submit" value="Generate and Detect" class="generate-button">
     </form>
-    <p>Generated Music</p>
+    <p>Generated (Unwatermarked) Music</p>
     <audio controls>
-        <source src="./out/unwatermarked_generation.wav" type="audio/mpeg">
+        <source src="http://127.0.0.1:8081/unwatermarked_generation.wav" type="audio/wav">
         Your browser does not support the audio element.
     </audio>
-    <p>Watermarked Music</p>
+    <p>Generated (Watermarked) Music</p>
     <audio controls>
-        <source src="./out/watermarked_generation.wav" type="audio/mpeg">
+        <source src="http://127.0.0.1:8081/watermarked_generation.wav" type="audio/wav">
         Your browser does not support the audio element.
     </audio>
     <div class="row">
@@ -155,13 +155,11 @@
 <!-- DETECTION CODE -->
 <div id="DetectWatermark" class="tabcontent">
     <h3>Upload wav for Watermark Detection</h3>
-    <label for="musicFile2" class="file-upload-button">Choose File</label>
     <form action="/detect_watermark" method="POST" enctype="multipart/form-data">
         <label for="music_file">Upload WAV File:</label>
         <input type="file" id="w_music_file" name="music_file"><br>
         <input type="submit" value="Detect Watermark" class="generate-button">
     </form>
-    <meter id="confidenceMeter" min="0" max="1" value="0"></meter>
     <div class="row">
         <audio id="toDetect_FilePlayer" controls style="margin-top: 20px; display: none;"></audio>
         <table id="table_toDetect">
