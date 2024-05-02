@@ -82,6 +82,7 @@
     #GenerateMusic {background-color: lightblue;}
     #DetectWatermark {background-color: lightblue;}
 </style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
 
@@ -110,8 +111,16 @@
 
         <input type="submit" value="Generate and Detect" class="generate-button">
     </form>
-    <input type="file" id="musicFile1" name="musicFile1" style="display: none;" onchange="updateFile(this)" accept=".wav">
-    <audio id="audioPlayer" controls style="margin-top: 20px; display: none;"></audio>
+    <p>Generated Music</p>
+    <audio controls>
+        <source src="./out/unwatermarked_generation.wav" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <p>Watermarked Music</p>
+    <audio controls>
+        <source src="./out/watermarked_generation.wav" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
     <div class="row">
         <audio id="generated_FilePlayer" controls style="margin-top: 20px; display: none;"></audio>
         <table id="table_generated_file">
@@ -147,8 +156,11 @@
 <div id="DetectWatermark" class="tabcontent">
     <h3>Upload wav for Watermark Detection</h3>
     <label for="musicFile2" class="file-upload-button">Choose File</label>
-    <input type="file" id="musicFile2" name="musicFile2" style="display: none;" onchange="updateFile(this)" accept=".wav">
-    <button class="generate-button" onclick="detectWatermark()">Detect!</button>
+    <form action="/detect_watermark" method="POST" enctype="multipart/form-data">
+        <label for="music_file">Upload WAV File:</label>
+        <input type="file" id="w_music_file" name="music_file"><br>
+        <input type="submit" value="Detect Watermark" class="generate-button">
+    </form>
     <meter id="confidenceMeter" min="0" max="1" value="0"></meter>
     <div class="row">
         <audio id="toDetect_FilePlayer" controls style="margin-top: 20px; display: none;"></audio>
@@ -203,102 +215,6 @@
         }
         document.getElementById(tabName).style.display = "block";
         evt.currentTarget.className += " active";
-    }
-
-    function updateFile(input) {
-        var audioPlayer = document.getElementById('audioPlayer');
-        // Check if a file is selected
-        if (input.files.length > 0) {
-            // Update the content of the audio player with the file name
-            audioPlayer.src = URL.createObjectURL(input.files[0]);
-            audioPlayer.style.display = 'block';
-        } else {
-            // If no file is selected, clear the audio player
-            audioPlayer.src = '';
-            audioPlayer.style.display = 'none';
-        }
-    }
-
-    function generateMusic() {
-        // Get the selected file
-        var fileInput = document.getElementById('musicFile1');
-        var file = fileInput.files[0];
-
-        // Check if a file is selected
-        if (!file) {
-            alert("Please select a file.");
-            return;
-        }
-
-        // Create FormData object to send file
-        var formData = new FormData();
-        formData.append('music_file', file);
-        formData.append('max_tokens', 512);
-
-        // Make AJAX request to Flask API
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/generate_music', true);
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                var response = JSON.parse(xhr.responseText);
-                // Handle the response from the Flask API
-                alert("Music generated successfully!");
-                // Download the generated wav file in response
-                var blob = new Blob([response.data], {type: 'audio/mpeg'});
-                var url = URL.createObjectURL(blob);
-                var a = document.createElement('a');
-                a.href = url;
-                a.download = 'generated_music.wav';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-            } else {
-                alert("Error generating music: " + xhr.statusText);
-            }
-        };
-        xhr.onerror = function () {
-            alert("Network error occurred.");
-        };
-        xhr.send(formData);
-    }
-
-    function detectWatermark() {
-        var confidence = 0.75; // Example confidence value
-
-        // Update the value of the meter element with the confidence percentage
-        var meter = document.getElementById('confidenceMeter');
-        meter.value = confidence;
-        return;
-        // Get the selected file
-        var fileInput = document.getElementById('musicFile2');
-        var file = fileInput.files[0];
-
-        // Check if a file is selected
-        if (!file) {
-            alert("Please select a file.");
-            return;
-        }
-
-        // Create FormData object to send file
-        var formData = new FormData();
-        formData.append('music_file', file);
-
-        // Make AJAX request to Flask API
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/detect_watermark', true);
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                var response = JSON.parse(xhr.responseText);
-                // Handle the response from the Flask API
-                alert("Watermark detected successfully!");
-            } else {
-                alert("Error detecting watermark: " + xhr.statusText);
-            }
-        };
-        xhr.onerror = function () {
-            alert("Network error occurred.");
-        };
-        xhr.send(formData);
     }
 </script>
 

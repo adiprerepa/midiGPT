@@ -6,10 +6,6 @@ from midigpt.datasets import BachChoralesEncoder
 
 app = Flask(__name__)
 
-# Replace these URLs with the actual URLs of your music generation and watermark detection APIs
-MUSIC_GENERATION_API_URL = "TODO: generate api"
-WATERMARK_DETECTION_API_URL = "TODO: watermark api"
-
 @app.route('/')
 def index():
     # Define your metrics and their values
@@ -50,20 +46,23 @@ def generate_music():
     
     unwatermarked_chords = encoder.decode(model.generate(seed_notes, max_tokens, do_sample= do_sample, temperature= temperature))
     
-    TetradPlayer().to_wav(unwatermarked_chords.flatten().reshape(-1, 4).cpu(), "unwatermarked_generation.wav", tempo = tempo)
+    unwatermark_path = "./out/unwatermarked_generation.wav"
+    watermark_path = "./out/watermarked_generation.wav"
+
+    TetradPlayer().to_wav(unwatermarked_chords.flatten().reshape(-1, 4).cpu(), unwatermark_path, tempo = tempo)
     
     unwatermarked_detection_result = watermark_detector.detect(text= unwatermarked_chords[-(max_tokens):])
     
     watermarked_chords = encoder.decode(model.generate(seed_notes, max_tokens, do_sample= do_sample, temperature= temperature, watermark_proccessor= watermark_processor))
     
-    TetradPlayer().to_wav(watermarked_chords.flatten().reshape(-1, 4).cpu(), "watermarked_generation.wav", tempo = tempo)
+    TetradPlayer().to_wav(watermarked_chords.flatten().reshape(-1, 4).cpu(), watermark_path, tempo = tempo)
 
     watermarked_detection_result = watermark_detector.detect(text= watermarked_chords[-(max_tokens):])
     
     
     combined_response = {
-        'unwatermarked_buffer': "unwatermarked_generation.wav",
-        'watermarked_buffer': "watermarked_generation.wav",
+        'unwatermarked_buffer': unwatermark_path,
+        'watermarked_buffer': watermark_path,
         'unwatermarked_detection_result': unwatermarked_detection_result,
         'watermarked_detection_result': watermarked_detection_result
     }
