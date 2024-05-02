@@ -1,0 +1,3 @@
+flask
+torch
+midigpt @ git+https://github.com/adiprerepa/midiGPT@main

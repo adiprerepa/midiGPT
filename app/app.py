@@ -6,18 +6,19 @@ from midigpt.datasets import BachChoralesEncoder
 
 app = Flask(__name__)
 
+default_metrics = [
+    {"name": "z-score Threshold", "value": None},
+    {"name": "z-score", "value": None},
+    {"name": "p value", "value": None},
+    {"name": "Tokens Counted (T)", "value": None},
+    {"name": "Prediction", "value": None},
+    {"name": "Fraction of T in Greenlist", "value": None},
+    {"name": "# Tokens in Greenlist", "value": None}
+]
+
 @app.route('/')
 def index():
-    # Define your metrics and their values
-    metrics = [
-        {"name": "z-score Threshold", "value": None},
-        {"name": "z-score", "value": None},
-        {"name": "p value", "value": None},
-        {"name": "Tokens Counted (T)", "value": None},
-        {"name": "Prediction", "value": None},
-        {"name": "Fraction of T in Greenlist", "value": None},
-        {"name": "# Tokens in Greenlist", "value": None}
-    ]
+    metrics = default_metrics
     return render_template('index.html', metrics=metrics, w_metrics=metrics, detect_metrics=metrics)
 
 @app.route('/generate_music', methods=['POST'])
@@ -28,14 +29,16 @@ def generate_music():
     music_file = request.files['music_file']
     
     #load model and tokenizer
-    model = GPT.from_checkpoint("projects/bach-chorales/best_model.ckpt", map_location=torch.device("cpu"))
+    model = GPT.from_checkpoint("../projects/bach-chorales/best_model.ckpt", map_location=torch.device("cpu"))
     encoder = BachChoralesEncoder()
     
     
-    max_tokens = int(request.args['max_tokens'])
-    tempo = int(request.args['tempo'])
-    do_sample = bool(request.args['do_sample'])
-    temperature= float(request.args['temperature'])
+    max_tokens = int(request.form['max_tokens'])
+    tempo = int(request.form['tempo'])
+    do_sample = True
+    temperature= float(request.form['temperature'])
+
+    print(f"max_tokens: {max_tokens}, tempo: {tempo}, do_sample: {do_sample}, temperature: {temperature}")
     
     chorale = TetradPlayer().from_wav(music_file, tempo = tempo)
     
@@ -71,7 +74,9 @@ def generate_music():
         return jsonify({'error': 'No file selected'}), 400
 
     try:
-        return jsonify(combined_response)
+        metrics = combined_response['unwatermarked_detection_result']
+        w_metrics = combined_response['watermarked_detection_result']
+        return render_template('index.html', metrics=metrics, w_metrics=w_metrics, detect_metrics=metrics)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -100,7 +105,8 @@ def detect_watermark():
 
     # Call the watermark detection API
     try:
-        return jsonify(response)
+        metrics = response['detection_result']
+        return render_template('index.html', detect_metrics=metrics)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
