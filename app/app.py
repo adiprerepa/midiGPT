@@ -27,12 +27,16 @@ def generate_music():
         return jsonify({'error': 'No file uploaded'}), 400
 
     music_file = request.files['music_file']
+
+    # write file to temp
+    with open("/tmp/temp.wav", 'wb') as f:
+        f.write(music_file.read())
+    music_file = "/Users/ayushraman/Documents/GitHub/midiGPT/generated-bach-1.5.wav"
     
     #load model and tokenizer
     model = GPT.from_checkpoint("../projects/bach-chorales/best_model.ckpt", map_location=torch.device("cpu"))
     encoder = BachChoralesEncoder()
-    
-    
+
     max_tokens = int(request.form['max_tokens'])
     tempo = int(request.form['tempo'])
     do_sample = True
@@ -69,9 +73,6 @@ def generate_music():
         'unwatermarked_detection_result': unwatermarked_detection_result,
         'watermarked_detection_result': watermarked_detection_result
     }
-    
-    if music_file.filename == '':
-        return jsonify({'error': 'No file selected'}), 400
 
     try:
         metrics = combined_response['unwatermarked_detection_result']
