@@ -6,6 +6,8 @@ Uses methods from https://arxiv.org/abs/2301.10226 to watermark chorales generat
 
 Authors: Aditya Prerepa, Tarun Suresh, Ayush Raman, Aditya Korlahalli
 
+UIUC Phil 380 Sp 24 Final Project
+
 ## Details & Running
 
 Flask webapp available in `app/app.py`
